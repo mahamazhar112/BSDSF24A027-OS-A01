@@ -28,3 +28,18 @@ Part 2's Makefile only had `TARGET`, `SRCS`, and `OBJS`, and a single rule that 
 **Q3: When you run `nm` on your `client_static` executable, are the symbols for functions like `mystrlen` present? What does this tell you about how static linking works?**
 
 Yes, running `nm bin/client_static` shows `mystrlen` (and the other library functions) with type `T`, meaning they are defined and present in the text (code) section of the executable itself. This confirms that static linking copies the actual machine code of the functions the program uses from the library archive directly into the final executable at link time, rather than referencing an external file. As a result, the executable is self-contained and larger, and it no longer needs `libmyutils.a` to run.
+
+
+## Feature 4: Creating and using Dynamic Library
+
+**Q1: What is Position-Independent Code (-fPIC) and why is it a fundamental requirement for creating shared libraries?**
+
+Position-Independent Code is machine code that doesn't depend on being loaded at one fixed memory address; it can run correctly no matter where in memory it gets placed. This is required for shared libraries because a `.so` file can be loaded at different addresses in different processes (or even at different times in the same process), and its code may be shared in memory across multiple running programs simultaneously. Without `-fPIC`, the code would contain hardcoded absolute addresses that would only be valid at one specific load location, which defeats the purpose of a shared library.
+
+**Q2: Explain the difference in file size between your static and dynamic clients. Why does this difference exist?**
+
+`client_static` (16752 bytes) is slightly larger than `client_dynamic` (16456 bytes). The static client has the actual machine code of `mystrlen`, `wordCount`, and the other library functions copied directly into the executable at link time, so the executable contains everything it needs to run. The dynamic client only contains a small reference/stub that tells the loader which shared library and symbols to resolve at runtime; the actual function code lives in the separate `libmyutils.so` file, not inside the executable itself. That's why the dynamic executable is smaller.
+
+**Q3: What is the LD_LIBRARY_PATH environment variable? Why was it necessary to set it for your program to run, and what does this tell you about the responsibilities of the operating system's dynamic loader?**
+
+`LD_LIBRARY_PATH` is an environment variable that tells the dynamic loader (`ld.so`) additional directories to search when looking for shared libraries at runtime. It was necessary because `libmyutils.so` lives in a custom project directory (`lib/`), not in one of the system's default library search paths (like `/usr/lib`), so without it the loader couldn't find the library and running `client_dynamic` failed with a "cannot open shared object file" error. This shows that, unlike static linking (where everything needed is baked into the executable at compile time), dynamic linking pushes the responsibility of locating and loading library code onto the operating system's loader at the moment the program actually runs, which is why `ldd` can be used to inspect exactly which shared libraries a program depends on and where they were resolved from.
