@@ -1,0 +1,26 @@
+.TH LIBMYUTILS 3 "September 2026" "BSDSF24A027" "Library Functions"
+.SH NAME
+libmyutils \- custom string and file utility functions
+.SH SYNOPSIS
+.B #include "mystrfunctions.h"
+.br
+.B #include "myfilefunctions.h"
+.sp
+.BI "int mystrlen(const char *" s ");"
+.br
+.BI "int mystrcpy(char *" dest ", const char *" src ");"
+.br
+.BI "int mystrncpy(char *" dest ", const char *" src ", int " n ");"
+.br
+.BI "int mystrcat(char *" dest ", const char *" src ");"
+.br
+.BI "int wordCount(FILE *" file ", int *" lines ", int *" words ", int *" chars ");"
+.br
+.BI "int mygrep(FILE *" fp ", const char *" search_str ", char ***" matches ");"
+.SH DESCRIPTION
+.B libmyutils
+is a small C utility library providing custom implementations of common
+string operations and file-based operations such as word counting and
+pattern searching.
+.SH AUTHOR
+Maha Mazhar <mahamazhar112@gmail.com>
